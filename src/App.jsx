@@ -2,7 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const FADE_DURATION_SECONDS = 30;
-const PHASES = ["Arrival", "Unloading", "Slowing", "Fading", "Exit"];
+const GOOD_NIGHT_PHASES = ["Arrival", "Unloading", "Slowing", "Fading", "Exit"];
+const FACILITATOR_PHASES = [
+  "Warm-up",
+  "Goal",
+  "Recent Example",
+  "Probe",
+  "Synthesis",
+];
 const PERSONAS = [
   {
     id: "mark",
@@ -38,6 +45,29 @@ const PERSONAS = [
       "Elderly widow knitting at night in a small warm apartment; stillness as company.",
   },
 ];
+const CASES = [
+  { id: "good-night", label: "Good Night", eyebrow: "Voice UX Prototype" },
+  {
+    id: "interview-facilitator",
+    label: "Interview Facilitator",
+    eyebrow: "Voice Agent Lab",
+  },
+];
+const FACILITATOR_SIGNALS = [
+  "Wait through short pauses before speaking.",
+  "Ask one short, non-leading question at a time.",
+  "Treat hesitation and restarts as thinking, not confusion.",
+  "Only summarize when the user sounds ready.",
+];
+const FACILITATOR_OUTPUTS = [
+  "Interview goal",
+  "Participant shape",
+  "3-5 question directions",
+];
+const FACILITATOR_EXAMPLES = [
+  "I want to interview people about how they unwind at night, but I don't know where the real tension is yet.",
+  "I'm preparing a conversation with remote workers about focus rituals and I need help figuring out what to probe.",
+];
 
 const getErrorMessage = (errorBody) => {
   if (!errorBody) return "Could not start realtime session.";
@@ -57,13 +87,27 @@ function App() {
   const realtimePeerRef = useRef(null);
   const realtimeStreamRef = useRef(null);
 
-  const [screen, setScreen] = useState("landing"); // landing | session | realtime | end
+  const [screen, setScreen] = useState("landing"); // landing | session | realtime | end | facilitator-lab
+  const [selectedCaseId, setSelectedCaseId] = useState("good-night");
   const [showCaseNotes, setShowCaseNotes] = useState(false);
   const [selectedPersonaId, setSelectedPersonaId] = useState("mark");
   const [isFading, setIsFading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
   const [realtimeStatus, setRealtimeStatus] = useState("idle");
   const [realtimeError, setRealtimeError] = useState("");
+  const [facilitatorGoal, setFacilitatorGoal] = useState(
+    "I want to prepare an interview about how people unwind at night, but I am still figuring out what is worth asking.",
+  );
+  const [facilitatorOutput, setFacilitatorOutput] = useState({
+    goal: "Understand what the interview is really trying to surface before locking into a guide.",
+    participant: "People who have a recurring evening routine but still feel a little unsettled before sleep.",
+    questions: [
+      "Can you walk me through the last evening that felt especially hard to wind down from?",
+      "What part of that night felt most active or unresolved?",
+      "Was there a moment when you noticed yourself choosing one habit over another?",
+      "What would have made that night feel easier or gentler?",
+    ],
+  });
 
   const selectedPersona =
     PERSONAS.find((persona) => persona.id === selectedPersonaId) || PERSONAS[0];
@@ -215,6 +259,34 @@ function App() {
     setTimeLeft(null);
   };
 
+  const openFacilitatorLab = () => {
+    setScreen("facilitator-lab");
+    setShowCaseNotes(false);
+    setRealtimeError("");
+  };
+
+  const returnToLanding = () => {
+    stopRealtimeSession();
+    setScreen("landing");
+    setRealtimeError("");
+  };
+
+  const generateFacilitatorOutput = () => {
+    const normalizedGoal = facilitatorGoal.trim();
+
+    setFacilitatorOutput({
+      goal: normalizedGoal || "Clarify the interview aim before fixing a question set.",
+      participant:
+        "People who are close enough to the topic to describe a recent lived example, not just opinions about it.",
+      questions: [
+        "Can you walk me through the most recent moment that made this topic feel real?",
+        "What was happening around you when that moment started to matter?",
+        "Where did you hesitate, adapt, or choose something different?",
+        "What would you want to understand better if you were interviewing someone about this?",
+      ],
+    });
+  };
+
   useEffect(() => {
     let timer;
 
@@ -273,6 +345,28 @@ function App() {
 
   return (
     <main className={`app ${screen === "session" ? "app-session" : ""}`}>
+      {(screen === "landing" || screen === "facilitator-lab") && (
+        <div className="mode-switcher" aria-label="Choose a case">
+          {CASES.map((item) => (
+            <button
+              aria-pressed={selectedCaseId === item.id}
+              className={`mode-chip ${
+                selectedCaseId === item.id ? "mode-chip-active" : ""
+              }`}
+              key={item.id}
+              onClick={() => {
+                setSelectedCaseId(item.id);
+                setShowCaseNotes(false);
+                setScreen(item.id === "good-night" ? "landing" : "facilitator-lab");
+              }}
+              type="button"
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {screen === "landing" && (
         <button
           className="case-toggle"
@@ -289,9 +383,7 @@ function App() {
           <p className="eyebrow">Voice UX Prototype</p>
           <h1>Good Night</h1>
           <p className="subtitle">A voice experience for letting go before sleep.</p>
-          <p className="description">
-            For nights when your mind keeps moving.
-          </p>
+          <p className="description">For nights when your mind keeps moving.</p>
           <div className="persona-selector" aria-label="Choose a voice persona">
             {PERSONAS.map((persona) => (
               <button
@@ -311,8 +403,14 @@ function App() {
           <button className="primary-button" onClick={startSession}>
             Play recorded demo
           </button>
-          <button className="secondary-button compact-button" onClick={startRealtimeSession}>
+          <button
+            className="secondary-button compact-button"
+            onClick={startRealtimeSession}
+          >
             Talk live with {selectedPersona.name}
+          </button>
+          <button className="ghost-link" onClick={openFacilitatorLab} type="button">
+            Open Interview Facilitator Lab
           </button>
           {realtimeError && <p className="error-note">{realtimeError}</p>}
         </section>
@@ -336,7 +434,7 @@ function App() {
           <div className="case-section">
             <span>Time Model</span>
             <ol className="phase-list" aria-label="Good Night session phases">
-              {PHASES.map((phase) => (
+              {GOOD_NIGHT_PHASES.map((phase) => (
                 <li key={phase}>{phase}</li>
               ))}
             </ol>
@@ -364,6 +462,101 @@ function App() {
         </aside>
       )}
 
+      {screen === "facilitator-lab" && (
+        <section className="facilitator-layout">
+          <div className="facilitator-hero">
+            <p className="eyebrow">Voice Agent Lab</p>
+            <h1>Interview Facilitator</h1>
+            <p className="subtitle">
+              A pause-aware voice agent for thinking-in-progress before an
+              interview.
+            </p>
+            <p className="description facilitator-description">
+              This lab is not about generating a question list too early. It is
+              about holding rhythm while the user is still forming what the
+              interview is really trying to learn.
+            </p>
+            <div className="phase-list" aria-label="Interview Facilitator phases">
+              {FACILITATOR_PHASES.map((phase) => (
+                <span className="phase-pill" key={phase}>
+                  {phase}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="facilitator-grid">
+            <section className="lab-panel">
+              <span className="panel-label">Session brief</span>
+              <h2>What are we trying to understand?</h2>
+              <p>
+                Start with a goal that still feels a little unfinished. The
+                agent should help clarify it without collapsing uncertainty too
+                soon.
+              </p>
+              <textarea
+                className="goal-input"
+                onChange={(event) => setFacilitatorGoal(event.target.value)}
+                rows={7}
+                value={facilitatorGoal}
+              />
+              <div className="example-stack">
+                {FACILITATOR_EXAMPLES.map((example) => (
+                  <button
+                    className="example-card"
+                    key={example}
+                    onClick={() => setFacilitatorGoal(example)}
+                    type="button"
+                  >
+                    {example}
+                  </button>
+                ))}
+              </div>
+              <button className="primary-button panel-button" onClick={generateFacilitatorOutput}>
+                Generate question directions
+              </button>
+            </section>
+
+            <section className="lab-panel">
+              <span className="panel-label">Interaction signal</span>
+              <h2>What the voice should protect</h2>
+              <div className="signal-list">
+                {FACILITATOR_SIGNALS.map((signal) => (
+                  <article className="signal-row" key={signal}>
+                    <p>{signal}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="lab-panel">
+              <span className="panel-label">Draft output</span>
+              <h2>Working interview direction</h2>
+              <div className="output-block">
+                <small>{FACILITATOR_OUTPUTS[0]}</small>
+                <p>{facilitatorOutput.goal}</p>
+              </div>
+              <div className="output-block">
+                <small>{FACILITATOR_OUTPUTS[1]}</small>
+                <p>{facilitatorOutput.participant}</p>
+              </div>
+              <div className="output-block">
+                <small>{FACILITATOR_OUTPUTS[2]}</small>
+                <ul className="question-list">
+                  {facilitatorOutput.questions.map((question) => (
+                    <li key={question}>{question}</li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          </div>
+
+          <button className="secondary-button back-button" onClick={returnToLanding}>
+            Back to Good Night
+          </button>
+        </section>
+      )}
+
       {screen === "session" && (
         <section className="screen session">
           <div className="breathing-dot" />
@@ -374,9 +567,7 @@ function App() {
           {timeLeft && <p className="time-left">{formatTime(timeLeft)}</p>}
 
           {isFading && (
-            <p className="fade-note">
-              The voice is becoming quieter now.
-            </p>
+            <p className="fade-note">The voice is becoming quieter now.</p>
           )}
 
           <button className="secondary-button" onClick={endSession}>
@@ -410,12 +601,8 @@ function App() {
       {screen === "end" && (
         <section className="screen end">
           <h1>Good night.</h1>
-          <p className="subtitle">
-            The session has ended.
-          </p>
-          <p className="description">
-            You can put the phone away.
-          </p>
+          <p className="subtitle">The session has ended.</p>
+          <p className="description">You can put the phone away.</p>
         </section>
       )}
     </main>
