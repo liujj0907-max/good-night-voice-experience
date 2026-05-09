@@ -1,23 +1,34 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
-const AUDIO_SRC = "/audio/mark-session.mp3";
 const FADE_DURATION_SECONDS = 30;
 const PHASES = ["Arrival", "Unloading", "Slowing", "Fading", "Exit"];
 const PERSONAS = [
   {
+    id: "mark",
     name: "Mark",
     role: "Release",
+    audioSrc: "/audio/mark-session.mp3",
+    sessionLine: "No need to reply.",
+    sessionDescription: "Just listen for a while.",
     note: "Warm, slightly distant, helps emotional residue loosen.",
   },
   {
+    id: "alice",
     name: "Alice",
     role: "Disengage",
+    audioSrc: "/audio/alice.mp3",
+    sessionLine: "You can stop participating now.",
+    sessionDescription: "Let the words get shorter.",
     note: "Grounded and minimal, reduces the need to participate.",
   },
   {
+    id: "marian",
     name: "Marian",
     role: "Settle",
+    audioSrc: "/audio/marian.mp3",
+    sessionLine: "You can leave it here.",
+    sessionDescription: "Nothing else needs to be held tonight.",
     note: "Stable, soft, almost unmoving; creates permission to stop.",
   },
 ];
@@ -28,11 +39,15 @@ function App() {
 
   const [screen, setScreen] = useState("landing"); // landing | session | end
   const [showCaseNotes, setShowCaseNotes] = useState(false);
+  const [selectedPersonaId, setSelectedPersonaId] = useState("mark");
   const [isFading, setIsFading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
 
+  const selectedPersona =
+    PERSONAS.find((persona) => persona.id === selectedPersonaId) || PERSONAS[0];
+
   const startSession = () => {
-    const audio = new Audio(AUDIO_SRC);
+    const audio = new Audio(selectedPersona.audioSrc);
     audio.volume = 1;
     audioRef.current = audio;
 
@@ -138,8 +153,24 @@ function App() {
           <p className="description">
             For nights when your mind keeps moving.
           </p>
+          <div className="persona-selector" aria-label="Choose a voice persona">
+            {PERSONAS.map((persona) => (
+              <button
+                aria-pressed={selectedPersonaId === persona.id}
+                className={`persona-option ${
+                  selectedPersonaId === persona.id ? "persona-option-active" : ""
+                }`}
+                key={persona.id}
+                onClick={() => setSelectedPersonaId(persona.id)}
+                type="button"
+              >
+                <span>{persona.name}</span>
+                <small>{persona.role}</small>
+              </button>
+            ))}
+          </div>
           <button className="primary-button" onClick={startSession}>
-            Start with Mark
+            Start with {selectedPersona.name}
           </button>
         </section>
       )}
@@ -172,7 +203,12 @@ function App() {
             <span>Persona Strategy</span>
             <div className="persona-list">
               {PERSONAS.map((persona) => (
-                <article className="persona-note" key={persona.name}>
+                <article
+                  className={`persona-note ${
+                    selectedPersonaId === persona.id ? "persona-note-active" : ""
+                  }`}
+                  key={persona.name}
+                >
                   <strong>
                     {persona.name} / {persona.role}
                   </strong>
@@ -187,9 +223,9 @@ function App() {
       {screen === "session" && (
         <section className="screen session">
           <div className="breathing-dot" />
-          <h1>Mark is here.</h1>
-          <p className="subtitle">No need to reply.</p>
-          <p className="description">Just listen for a while.</p>
+          <h1>{selectedPersona.name} is here.</h1>
+          <p className="subtitle">{selectedPersona.sessionLine}</p>
+          <p className="description">{selectedPersona.sessionDescription}</p>
 
           {timeLeft && <p className="time-left">{formatTime(timeLeft)}</p>}
 

@@ -127,6 +127,10 @@ button {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.persona-note-active {
+  border-top-color: rgba(255, 255, 255, 0.24);
+}
+
 .persona-note strong {
   display: block;
   margin-bottom: 5px;
@@ -175,9 +179,63 @@ h1 {
   color: rgba(255, 255, 255, 0.52);
 }
 
+.persona-selector {
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 36px auto 0;
+}
+
+.persona-option {
+  min-height: 78px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 13px 10px;
+  color: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.persona-option:hover {
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.persona-option-active {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.34);
+  transform: translateY(-1px);
+}
+
+.persona-option span,
+.persona-option small {
+  display: block;
+}
+
+.persona-option span {
+  font-size: 0.96rem;
+}
+
+.persona-option small {
+  margin-top: 7px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
 .primary-button,
 .secondary-button {
-  margin-top: 44px;
+  margin-top: 28px;
   min-width: 180px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
@@ -248,6 +306,15 @@ h1 {
     max-height: none;
     margin: 34px auto 0;
     padding: 18px;
+  }
+
+  .persona-selector {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+  }
+
+  .persona-option {
+    min-height: 64px;
   }
 
   h1 {

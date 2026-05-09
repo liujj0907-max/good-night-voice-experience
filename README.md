@@ -28,13 +28,13 @@ The broader concept uses three personas as different ways of helping the user le
 - Alice / Disengage: grounded and minimal, reduces participation
 - Marian / Settle: stable and soft, creates permission to stop
 
-The current implementation focuses on the Mark session first.
+The current implementation includes playable demos for all three personas.
 
 ## Current Features
 
 - Minimal React + Vite prototype
-- One-tap start
-- Mark voice session playback
+- Persona selection for Mark, Alice, and Marian
+- Persona-specific voice session playback
 - Dark, low-stimulation interface
 - Breathing dot during the session
 - Final 30-second audio fade
