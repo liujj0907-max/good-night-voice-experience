@@ -172,8 +172,13 @@ const server = createServer(async (req, res) => {
     const responseText = await openaiResponse.text();
 
     if (!openaiResponse.ok) {
-      res.writeHead(openaiResponse.status, { "Content-Type": "application/json" });
-      res.end(responseText);
+      const errorBody = JSON.parse(responseText);
+      sendJson(res, openaiResponse.status, {
+        error:
+          errorBody?.error?.message ||
+          errorBody?.error ||
+          "OpenAI Realtime API returned an error.",
+      });
       return;
     }
 

@@ -39,6 +39,16 @@ const PERSONAS = [
   },
 ];
 
+const getErrorMessage = (errorBody) => {
+  if (!errorBody) return "Could not start realtime session.";
+  if (typeof errorBody.error === "string") return errorBody.error;
+  if (typeof errorBody.error?.message === "string") {
+    return errorBody.error.message;
+  }
+  if (typeof errorBody.message === "string") return errorBody.message;
+  return "Could not start realtime session.";
+};
+
 function App() {
   const audioRef = useRef(null);
   const fadeIntervalRef = useRef(null);
@@ -169,7 +179,7 @@ function App() {
 
       if (!response.ok) {
         const errorBody = await response.json().catch(() => null);
-        throw new Error(errorBody?.error || "Could not start realtime session.");
+        throw new Error(getErrorMessage(errorBody));
       }
 
       const answer = {
