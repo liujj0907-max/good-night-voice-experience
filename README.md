@@ -55,6 +55,10 @@ This case focuses on voice as presence rather than instruction. The goal is to r
 
 The strongest principle is designed withdrawal: voice, UI, and prompts gradually reduce their presence so the user can leave the interaction.
 
+## Realtime Playground
+
+Prompt drafts for testing Good Night with OpenAI Playground and `gpt-realtime-2` are in [docs/realtime-playground-prompts.md](docs/realtime-playground-prompts.md).
+
 ## Run Locally
 
 ```bash
