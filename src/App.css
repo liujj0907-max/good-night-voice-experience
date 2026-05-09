@@ -270,6 +270,19 @@ h1 {
   color: rgba(255, 255, 255, 0.62);
 }
 
+.compact-button {
+  display: block;
+  margin: 14px auto 0;
+}
+
+.error-note {
+  max-width: 360px;
+  margin: 18px auto 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(255, 170, 170, 0.76);
+}
+
 .breathing-dot {
   width: 18px;
   height: 18px;

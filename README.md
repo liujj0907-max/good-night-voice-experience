@@ -43,6 +43,7 @@ These backgrounds are not meant to become visible roleplay prompts inside the se
 - Minimal React + Vite prototype
 - Persona selection for Mark, Alice, and Marian
 - Persona-specific voice session playback
+- Live Realtime voice mode for Mark, Alice, and Marian
 - Dark, low-stimulation interface
 - Breathing dot during the session
 - Final 30-second audio fade
@@ -58,6 +59,12 @@ The strongest principle is designed withdrawal: voice, UI, and prompts gradually
 ## Realtime Playground
 
 Prompt drafts for testing Good Night with OpenAI Playground and `gpt-realtime-2` are in [docs/realtime-playground-prompts.md](docs/realtime-playground-prompts.md).
+
+The local prototype also includes a live Realtime mode. It uses a small local server in `server.mjs` so the OpenAI API key stays outside the browser.
+
+```bash
+OPENAI_API_KEY=your_api_key npm run dev
+```
 
 ## Run Locally
 

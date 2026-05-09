@@ -42,12 +42,18 @@ const PERSONAS = [
 function App() {
   const audioRef = useRef(null);
   const fadeIntervalRef = useRef(null);
+  const realtimeAudioRef = useRef(null);
+  const realtimeChannelRef = useRef(null);
+  const realtimePeerRef = useRef(null);
+  const realtimeStreamRef = useRef(null);
 
-  const [screen, setScreen] = useState("landing"); // landing | session | end
+  const [screen, setScreen] = useState("landing"); // landing | session | realtime | end
   const [showCaseNotes, setShowCaseNotes] = useState(false);
   const [selectedPersonaId, setSelectedPersonaId] = useState("mark");
   const [isFading, setIsFading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [realtimeStatus, setRealtimeStatus] = useState("idle");
+  const [realtimeError, setRealtimeError] = useState("");
 
   const selectedPersona =
     PERSONAS.find((persona) => persona.id === selectedPersonaId) || PERSONAS[0];
@@ -67,7 +73,122 @@ function App() {
     audio.addEventListener("ended", endSession);
   };
 
+  const stopRealtimeSession = () => {
+    if (realtimeChannelRef.current) {
+      realtimeChannelRef.current.close();
+      realtimeChannelRef.current = null;
+    }
+
+    if (realtimePeerRef.current) {
+      realtimePeerRef.current.close();
+      realtimePeerRef.current = null;
+    }
+
+    if (realtimeStreamRef.current) {
+      realtimeStreamRef.current.getTracks().forEach((track) => track.stop());
+      realtimeStreamRef.current = null;
+    }
+
+    if (realtimeAudioRef.current) {
+      realtimeAudioRef.current.srcObject = null;
+    }
+
+    setRealtimeStatus("idle");
+  };
+
+  const startRealtimeSession = async () => {
+    setScreen("realtime");
+    setRealtimeStatus("connecting");
+    setRealtimeError("");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const peerConnection = new RTCPeerConnection();
+      const dataChannel = peerConnection.createDataChannel("oai-events");
+
+      realtimePeerRef.current = peerConnection;
+      realtimeStreamRef.current = stream;
+      realtimeChannelRef.current = dataChannel;
+
+      stream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, stream);
+      });
+
+      peerConnection.ontrack = (event) => {
+        if (realtimeAudioRef.current) {
+          realtimeAudioRef.current.srcObject = event.streams[0];
+        }
+      };
+
+      dataChannel.onopen = () => {
+        setRealtimeStatus("listening");
+        dataChannel.send(
+          JSON.stringify({
+            type: "response.create",
+            response: {
+              instructions:
+                "Begin with one very short, quiet greeting in the persona voice. Do not ask more than one simple question.",
+            },
+          }),
+        );
+      };
+
+      dataChannel.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.type === "response.audio.delta") {
+          setRealtimeStatus("speaking");
+        }
+
+        if (
+          message.type === "response.audio.done" ||
+          message.type === "response.done"
+        ) {
+          setRealtimeStatus("listening");
+        }
+
+        if (message.type === "error") {
+          setRealtimeStatus("error");
+          setRealtimeError(message.error?.message || "Realtime session failed.");
+        }
+      };
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+
+      const response = await fetch(
+        `/api/realtime/session?persona=${selectedPersona.id}`,
+        {
+          method: "POST",
+          body: offer.sdp,
+          headers: {
+            "Content-Type": "application/sdp",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        throw new Error(errorBody?.error || "Could not start realtime session.");
+      }
+
+      const answer = {
+        type: "answer",
+        sdp: await response.text(),
+      };
+
+      await peerConnection.setRemoteDescription(answer);
+    } catch (error) {
+      stopRealtimeSession();
+      setScreen("landing");
+      setRealtimeStatus("error");
+      setRealtimeError(error.message);
+    }
+  };
+
   const endSession = () => {
+    stopRealtimeSession();
+
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
@@ -128,6 +249,8 @@ function App() {
       if (fadeIntervalRef.current) {
         clearInterval(fadeIntervalRef.current);
       }
+
+      stopRealtimeSession();
     };
   }, []);
 
@@ -176,8 +299,12 @@ function App() {
             ))}
           </div>
           <button className="primary-button" onClick={startSession}>
-            Start with {selectedPersona.name}
+            Play recorded demo
           </button>
+          <button className="secondary-button compact-button" onClick={startRealtimeSession}>
+            Talk live with {selectedPersona.name}
+          </button>
+          {realtimeError && <p className="error-note">{realtimeError}</p>}
         </section>
       )}
 
@@ -241,6 +368,28 @@ function App() {
               The voice is becoming quieter now.
             </p>
           )}
+
+          <button className="secondary-button" onClick={endSession}>
+            Good Night
+          </button>
+        </section>
+      )}
+
+      {screen === "realtime" && (
+        <section className="screen session">
+          <audio autoPlay ref={realtimeAudioRef} />
+          <div className="breathing-dot" />
+          <h1>{selectedPersona.name} is listening.</h1>
+          <p className="subtitle">
+            {realtimeStatus === "connecting"
+              ? "Connecting the live voice."
+              : "You can speak softly now."}
+          </p>
+          <p className="description">
+            This mode uses the microphone and responds in real time.
+          </p>
+
+          <p className="time-left">{realtimeStatus}</p>
 
           <button className="secondary-button" onClick={endSession}>
             Good Night
