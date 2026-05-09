@@ -1,36 +1,16 @@
-# Good Night Voice Experience
+# React + Vite
 
-A deployed Voice UX prototype exploring how fading voice, silence, and reduced interaction can support bedtime disengagement.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Concept
+Currently, two official plugins are available:
 
-Good Night is not designed as a general-purpose chatbot.  
-It is a minimal bedtime voice experience that gradually reduces verbal presence, interaction demand, and screen stimulation.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-The prototype tests whether a fading voice session can help users disengage from the phone before sleep.
+## React Compiler
 
-## Core Flow
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-Start → Listen → Fade → Exit
+## Expanding the ESLint configuration
 
-## Prototype Features
-
-- One-tap start
-- Mark voice session
-- Dark low-stimulation interface
-- Slow breathing dot
-- Manual “Good Night” exit
-- Audio fade-out in the final 30 seconds
-- End screen encouraging the user to put the phone away
-
-## Design Focus
-
-- Voice as presence, not instruction
-- Silence as part of the interaction
-- Reduced verbal density
-- User-led exit
-- Sleep-oriented attention lowering
-
-## Status
-
-Version 1: local prototype running in React + Vite.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
