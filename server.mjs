@@ -150,13 +150,24 @@ const server = createServer(async (req, res) => {
       }),
     );
 
-    const openaiResponse = await fetch("https://api.openai.com/v1/realtime/calls", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: fd,
-    });
+    let openaiResponse;
+
+    try {
+      openaiResponse = await fetch("https://api.openai.com/v1/realtime/calls", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: fd,
+      });
+    } catch (error) {
+      sendJson(res, 502, {
+        error:
+          "Could not reach OpenAI Realtime API. Check that SakuraCat is running on 127.0.0.1:7897, then restart npm run dev.",
+        detail: error.message,
+      });
+      return;
+    }
 
     const responseText = await openaiResponse.text();
 
