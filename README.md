@@ -1,16 +1,47 @@
-# React + Vite
+# Good Night Voice Experience
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Good Night is a small Voice UX prototype exploring how a voice experience can help someone disengage from their phone before sleep.
 
-Currently, two official plugins are available:
+It is not designed as a general-purpose chatbot. The interaction is intentionally quiet: one tap to begin, a low-stimulation screen, a short voice presence, and a gradual fade toward silence.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Concept
 
-## React Compiler
+Many bedtime products try to add more content: longer stories, more prompts, more choices, more tracking. Good Night tests the opposite direction.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The prototype asks:
 
-## Expanding the ESLint configuration
+- What if the voice gradually becomes less present?
+- What if the user is not asked to reply?
+- What if the end of the interaction is a cue to put the phone away?
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Prototype Flow
+
+Start with Mark -> Listen -> Voice fades -> Good Night
+
+## Current Features
+
+- Minimal React + Vite prototype
+- One-tap start
+- Mark voice session playback
+- Dark, low-stimulation interface
+- Breathing dot during the session
+- Final 30-second audio fade
+- Manual Good Night exit
+- End screen encouraging phone disengagement
+
+## Design Direction
+
+This case focuses on voice as presence rather than instruction. The goal is to reduce interaction demand, lower visual stimulation, and make silence part of the experience.
+
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
