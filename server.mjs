@@ -1,5 +1,34 @@
 import { createServer } from "node:http";
+import { readFile } from "node:fs/promises";
 import { createServer as createViteServer } from "vite";
+
+const loadLocalEnv = async () => {
+  try {
+    const contents = await readFile(".env.local", "utf8");
+
+    contents
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"))
+      .forEach((line) => {
+        const separatorIndex = line.indexOf("=");
+        if (separatorIndex === -1) return;
+
+        const key = line.slice(0, separatorIndex).trim();
+        const value = line.slice(separatorIndex + 1).trim();
+
+        if (key && !process.env[key]) {
+          process.env[key] = value.replace(/^["']|["']$/g, "");
+        }
+      });
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+};
+
+await loadLocalEnv();
 
 const PORT = Number(process.env.PORT || 5173);
 const MODEL = "gpt-realtime-2";
