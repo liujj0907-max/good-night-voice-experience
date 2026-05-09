@@ -12,6 +12,8 @@ const PERSONAS = [
     sessionLine: "No need to reply.",
     sessionDescription: "Just listen for a while.",
     note: "Warm, slightly distant, helps emotional residue loosen.",
+    source:
+      "After-hours bar worker; used to listening without keeping people awake.",
   },
   {
     id: "alice",
@@ -21,6 +23,8 @@ const PERSONAS = [
     sessionLine: "You can stop participating now.",
     sessionDescription: "Let the words get shorter.",
     note: "Grounded and minimal, reduces the need to participate.",
+    source:
+      "Night-shift emergency doctor; calm, economical, and practiced at transitions.",
   },
   {
     id: "marian",
@@ -30,6 +34,8 @@ const PERSONAS = [
     sessionLine: "You can leave it here.",
     sessionDescription: "Nothing else needs to be held tonight.",
     note: "Stable, soft, almost unmoving; creates permission to stop.",
+    source:
+      "Elderly widow knitting at night in a small warm apartment; stillness as company.",
   },
 ];
 
@@ -213,6 +219,7 @@ function App() {
                     {persona.name} / {persona.role}
                   </strong>
                   <p>{persona.note}</p>
+                  <small>{persona.source}</small>
                 </article>
               ))}
             </div>

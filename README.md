@@ -30,6 +30,14 @@ The broader concept uses three personas as different ways of helping the user le
 
 The current implementation includes playable demos for all three personas.
 
+## Voice Temperament Sources
+
+These backgrounds are not meant to become visible roleplay prompts inside the session. They are design sources for pacing, tone, and the amount of presence each voice should carry.
+
+- Mark: around 35, gentle, works in a bar, and is usually awake after hours. His voice should feel like someone who can listen without pulling the user into more conversation.
+- Alice: around 32, an emergency doctor who often works shifts. Her voice should feel grounded, brief, and able to help the user transition out of active participation.
+- Marian: around 85, widowed for six years, living with a cat in an old but warm apartment. Her nighttime image is knitting on the sofa; her voice should create quiet permission to stop.
+
 ## Current Features
 
 - Minimal React + Vite prototype
