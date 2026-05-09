@@ -1,6 +1,6 @@
 # Good Night Voice Experience
 
-Good Night is a small Voice UX prototype exploring how a voice experience can help someone disengage from their phone before sleep.
+Good Night is a time-based Voice UX prototype exploring how a voice experience can help someone disengage from their phone before sleep.
 
 It is not designed as a general-purpose chatbot. The interaction is intentionally quiet: one tap to begin, a low-stimulation screen, a short voice presence, and a gradual fade toward silence.
 
@@ -16,7 +16,19 @@ The prototype asks:
 
 ## Prototype Flow
 
-Start with Mark -> Listen -> Voice fades -> Good Night
+Arrival -> Unloading -> Slowing -> Fading -> Exit
+
+The key design question is not only what the AI should say, but when the AI is no longer needed to speak.
+
+## Persona Strategy
+
+The broader concept uses three personas as different ways of helping the user let go:
+
+- Mark / Release: warm, slightly distant, helps emotional residue loosen
+- Alice / Disengage: grounded and minimal, reduces participation
+- Marian / Settle: stable and soft, creates permission to stop
+
+The current implementation focuses on the Mark session first.
 
 ## Current Features
 
@@ -32,6 +44,8 @@ Start with Mark -> Listen -> Voice fades -> Good Night
 ## Design Direction
 
 This case focuses on voice as presence rather than instruction. The goal is to reduce interaction demand, lower visual stimulation, and make silence part of the experience.
+
+The strongest principle is designed withdrawal: voice, UI, and prompts gradually reduce their presence so the user can leave the interaction.
 
 ## Run Locally
 

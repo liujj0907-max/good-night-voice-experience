@@ -3,6 +3,24 @@ import "./App.css";
 
 const AUDIO_SRC = "/audio/mark-session.mp3";
 const FADE_DURATION_SECONDS = 30;
+const PHASES = ["Arrival", "Unloading", "Slowing", "Fading", "Exit"];
+const PERSONAS = [
+  {
+    name: "Mark",
+    role: "Release",
+    note: "Warm, slightly distant, helps emotional residue loosen.",
+  },
+  {
+    name: "Alice",
+    role: "Disengage",
+    note: "Grounded and minimal, reduces the need to participate.",
+  },
+  {
+    name: "Marian",
+    role: "Settle",
+    note: "Stable, soft, almost unmoving; creates permission to stop.",
+  },
+];
 
 function App() {
   const audioRef = useRef(null);
@@ -128,17 +146,40 @@ function App() {
 
       {screen === "landing" && showCaseNotes && (
         <aside className="case-notes" id="case-notes">
-          <div>
-            <span>Persona</span>
-            <p>Someone tired but mentally active, still holding the phone at bedtime.</p>
+          <div className="case-section">
+            <span>North Star</span>
+            <p>
+              Help the user leave interaction within a bounded bedtime session,
+              not make the conversation more engaging.
+            </p>
           </div>
-          <div>
-            <span>Insight</span>
+
+          <div className="case-section">
+            <span>Design Shift</span>
             <p>Sleep support can reduce presence instead of adding more content.</p>
           </div>
-          <div>
-            <span>Principle</span>
-            <p>The voice should feel nearby, then gradually make room for silence.</p>
+
+          <div className="case-section">
+            <span>Time Model</span>
+            <ol className="phase-list" aria-label="Good Night session phases">
+              {PHASES.map((phase) => (
+                <li key={phase}>{phase}</li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="case-section">
+            <span>Persona Strategy</span>
+            <div className="persona-list">
+              {PERSONAS.map((persona) => (
+                <article className="persona-note" key={persona.name}>
+                  <strong>
+                    {persona.name} / {persona.role}
+                  </strong>
+                  <p>{persona.note}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </aside>
       )}
