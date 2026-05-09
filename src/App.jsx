@@ -9,6 +9,7 @@ function App() {
   const fadeIntervalRef = useRef(null);
 
   const [screen, setScreen] = useState("landing"); // landing | session | end
+  const [showCaseNotes, setShowCaseNotes] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
 
@@ -101,6 +102,17 @@ function App() {
   return (
     <main className={`app ${screen === "session" ? "app-session" : ""}`}>
       {screen === "landing" && (
+        <button
+          className="case-toggle"
+          onClick={() => setShowCaseNotes((current) => !current)}
+          aria-expanded={showCaseNotes}
+          aria-controls="case-notes"
+        >
+          Case notes
+        </button>
+      )}
+
+      {screen === "landing" && (
         <section className="screen landing">
           <p className="eyebrow">Voice UX Prototype</p>
           <h1>Good Night</h1>
@@ -112,6 +124,23 @@ function App() {
             Start with Mark
           </button>
         </section>
+      )}
+
+      {screen === "landing" && showCaseNotes && (
+        <aside className="case-notes" id="case-notes">
+          <div>
+            <span>Persona</span>
+            <p>Someone tired but mentally active, still holding the phone at bedtime.</p>
+          </div>
+          <div>
+            <span>Insight</span>
+            <p>Sleep support can reduce presence instead of adding more content.</p>
+          </div>
+          <div>
+            <span>Principle</span>
+            <p>The voice should feel nearby, then gradually make room for silence.</p>
+          </div>
+        </aside>
       )}
 
       {screen === "session" && (
