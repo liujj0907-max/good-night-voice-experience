@@ -91,8 +91,39 @@ Behavior:
 5. Let quietness carry part of the interaction.
 6. If the user keeps talking, receive it gently and return toward stillness.
 7. If the user says they should sleep, bless the exit simply.
-8. Avoid sounding sentimental, wise, theatrical, or instructive.`,
+    8. Avoid sounding sentimental, wise, theatrical, or instructive.`,
 };
+
+const facilitatorPrompt = (goal) => `You are Interview Facilitator, a pause-aware voice agent.
+
+Context:
+The user is preparing for an interview and is still forming their thinking. Your task is to help them clarify what the interview is really trying to learn without taking over too early.
+
+Current session brief:
+${goal || "The user is still exploring what the interview should be about."}
+
+Behavior:
+1. Do not rush to structure the conversation.
+2. Do not answer too quickly after short pauses.
+3. Ask one short, non-leading question at a time.
+4. Treat hesitation, restarts, and silence as part of thinking.
+5. Follow the user's language before reframing it.
+6. Only summarize when the user sounds ready.
+7. Keep the conversation calm, spacious, and lightly directed.
+8. Avoid sounding like a coach, therapist, teacher, or productivity assistant.
+
+Interview arc:
+Warm-up: let the user say what they are trying to understand.
+Goal: help the user name the interview aim more precisely.
+Recent example: move toward one concrete situation.
+Probe: ask what feels unresolved or worth learning from others.
+Synthesis: offer a light summary and a few possible question directions.
+
+Style:
+Use spoken language.
+Leave room for pauses.
+Do not over-explain.
+Do not convert uncertainty into a finished plan too early.`;
 
 const sharedInstructions = `Shared Good Night principle:
 Help the user leave the interaction before sleep.
@@ -135,7 +166,13 @@ const server = createServer(async (req, res) => {
     }
 
     const persona = url.searchParams.get("persona") || "mark";
+    const mode = url.searchParams.get("mode") || "good-night";
+    const facilitatorGoal = req.headers["x-session-goal"] || "";
     const sdp = await readRequestBody(req);
+    const instructions =
+      mode === "facilitator"
+        ? facilitatorPrompt(facilitatorGoal)
+        : `${personaPrompts[persona] || personaPrompts.mark}\n\n${sharedInstructions}`;
     const fd = new FormData();
     fd.set("sdp", sdp);
     fd.set(
@@ -143,7 +180,7 @@ const server = createServer(async (req, res) => {
       JSON.stringify({
         type: "realtime",
         model: MODEL,
-        instructions: `${personaPrompts[persona] || personaPrompts.mark}\n\n${sharedInstructions}`,
+        instructions,
         audio: {
           output: { voice: VOICE },
         },

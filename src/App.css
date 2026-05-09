@@ -326,6 +326,11 @@ h1 {
   margin-top: 18px;
 }
 
+.panel-error {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .signal-list {
   display: grid;
   gap: 12px;

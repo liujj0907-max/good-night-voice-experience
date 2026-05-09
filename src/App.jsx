@@ -95,6 +95,8 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [realtimeStatus, setRealtimeStatus] = useState("idle");
   const [realtimeError, setRealtimeError] = useState("");
+  const [realtimeExperience, setRealtimeExperience] = useState("good-night");
+  const [realtimeReturnScreen, setRealtimeReturnScreen] = useState("landing");
   const [facilitatorGoal, setFacilitatorGoal] = useState(
     "I want to prepare an interview about how people unwind at night, but I am still figuring out what is worth asking.",
   );
@@ -150,7 +152,15 @@ function App() {
     setRealtimeStatus("idle");
   };
 
-  const startRealtimeSession = async () => {
+  const startRealtimeSession = async ({
+    experience,
+    requestUrl,
+    returnScreen,
+    initialInstructions,
+    requestHeaders = {},
+  }) => {
+    setRealtimeExperience(experience);
+    setRealtimeReturnScreen(returnScreen);
     setScreen("realtime");
     setRealtimeStatus("connecting");
     setRealtimeError("");
@@ -180,8 +190,7 @@ function App() {
           JSON.stringify({
             type: "response.create",
             response: {
-              instructions:
-                "Begin with one very short, quiet greeting in the persona voice. Do not ask more than one simple question.",
+              instructions: initialInstructions,
             },
           }),
         );
@@ -211,12 +220,13 @@ function App() {
       await peerConnection.setLocalDescription(offer);
 
       const response = await fetch(
-        `/api/realtime/session?persona=${selectedPersona.id}`,
+        requestUrl,
         {
           method: "POST",
           body: offer.sdp,
           headers: {
             "Content-Type": "application/sdp",
+            ...requestHeaders,
           },
         },
       );
@@ -234,11 +244,32 @@ function App() {
       await peerConnection.setRemoteDescription(answer);
     } catch (error) {
       stopRealtimeSession();
-      setScreen("landing");
+      setScreen(returnScreen);
       setRealtimeStatus("error");
       setRealtimeError(error.message);
     }
   };
+
+  const startGoodNightRealtimeSession = () =>
+    startRealtimeSession({
+      experience: "good-night",
+      requestUrl: `/api/realtime/session?persona=${selectedPersona.id}`,
+      returnScreen: "landing",
+      initialInstructions:
+        "Begin with one very short, quiet greeting in the persona voice. Do not ask more than one simple question.",
+    });
+
+  const startFacilitatorRealtimeSession = () =>
+    startRealtimeSession({
+      experience: "facilitator",
+      requestUrl: "/api/realtime/session?mode=facilitator",
+      returnScreen: "facilitator-lab",
+      requestHeaders: {
+        "X-Session-Goal": facilitatorGoal,
+      },
+      initialInstructions:
+        "Begin gently. Acknowledge that the user may still be forming their thinking. Ask one short question about what they are really trying to understand, then leave room for silence.",
+    });
 
   const endSession = () => {
     stopRealtimeSession();
@@ -268,6 +299,12 @@ function App() {
   const returnToLanding = () => {
     stopRealtimeSession();
     setScreen("landing");
+    setRealtimeError("");
+  };
+
+  const leaveRealtimeSession = () => {
+    stopRealtimeSession();
+    setScreen(realtimeReturnScreen);
     setRealtimeError("");
   };
 
@@ -405,7 +442,7 @@ function App() {
           </button>
           <button
             className="secondary-button compact-button"
-            onClick={startRealtimeSession}
+            onClick={startGoodNightRealtimeSession}
           >
             Talk live with {selectedPersona.name}
           </button>
@@ -515,6 +552,15 @@ function App() {
               <button className="primary-button panel-button" onClick={generateFacilitatorOutput}>
                 Generate question directions
               </button>
+              <button
+                className="secondary-button panel-button"
+                onClick={startFacilitatorRealtimeSession}
+              >
+                Talk live with Facilitator
+              </button>
+              {realtimeError && screen === "facilitator-lab" && (
+                <p className="error-note panel-error">{realtimeError}</p>
+              )}
             </section>
 
             <section className="lab-panel">
@@ -580,20 +626,33 @@ function App() {
         <section className="screen session">
           <audio autoPlay ref={realtimeAudioRef} />
           <div className="breathing-dot" />
-          <h1>{selectedPersona.name} is listening.</h1>
+          <h1>
+            {realtimeExperience === "facilitator"
+              ? "Facilitator is listening."
+              : `${selectedPersona.name} is listening.`}
+          </h1>
           <p className="subtitle">
             {realtimeStatus === "connecting"
               ? "Connecting the live voice."
-              : "You can speak softly now."}
+              : realtimeExperience === "facilitator"
+                ? "Speak your interview thought as it is forming."
+                : "You can speak softly now."}
           </p>
           <p className="description">
-            This mode uses the microphone and responds in real time.
+            {realtimeExperience === "facilitator"
+              ? "This mode listens for thinking-in-progress and responds with short, pause-aware questions."
+              : "This mode uses the microphone and responds in real time."}
           </p>
 
           <p className="time-left">{realtimeStatus}</p>
+          {realtimeExperience === "facilitator" && (
+            <p className="fade-note">
+              The facilitator should wait through pauses instead of filling them too fast.
+            </p>
+          )}
 
-          <button className="secondary-button" onClick={endSession}>
-            Good Night
+          <button className="secondary-button" onClick={leaveRealtimeSession}>
+            {realtimeExperience === "facilitator" ? "Back to Lab" : "Good Night"}
           </button>
         </section>
       )}
