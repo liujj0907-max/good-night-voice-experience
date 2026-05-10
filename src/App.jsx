@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const FADE_DURATION_SECONDS = 30;
+const assetPath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
 const GOOD_NIGHT_PHASES = ["Arrival", "Unloading", "Slowing", "Fading", "Exit"];
 const FACILITATOR_PHASES = [
   "Warm-up",
@@ -15,7 +16,7 @@ const PERSONAS = [
     id: "mark",
     name: "Mark",
     role: "Release",
-    audioSrc: "/audio/mark-session.mp3",
+    audioSrc: assetPath("/audio/mark-session.mp3"),
     sessionLine: "No need to reply.",
     sessionDescription: "Just listen for a while.",
     note: "Warm, slightly distant, helps emotional residue loosen.",
@@ -26,7 +27,7 @@ const PERSONAS = [
     id: "alice",
     name: "Alice",
     role: "Disengage",
-    audioSrc: "/audio/alice.mp3",
+    audioSrc: assetPath("/audio/alice.mp3"),
     sessionLine: "You can stop participating now.",
     sessionDescription: "Let the words get shorter.",
     note: "Grounded and minimal, reduces the need to participate.",
@@ -37,7 +38,7 @@ const PERSONAS = [
     id: "marian",
     name: "Marian",
     role: "Settle",
-    audioSrc: "/audio/marian.mp3",
+    audioSrc: assetPath("/audio/marian.mp3"),
     sessionLine: "You can leave it here.",
     sessionDescription: "Nothing else needs to be held tonight.",
     note: "Stable, soft, almost unmoving; creates permission to stop.",
@@ -87,6 +88,7 @@ const getErrorMessage = (errorBody) => {
 };
 
 function App() {
+  const liveModeAvailable = import.meta.env.DEV;
   const audioRef = useRef(null);
   const fadeIntervalRef = useRef(null);
   const realtimeAudioRef = useRef(null);
@@ -500,6 +502,7 @@ function App() {
           </button>
           <button
             className="secondary-button compact-button"
+            disabled={!liveModeAvailable}
             onClick={startGoodNightRealtimeSession}
           >
             Talk live with {selectedPersona.name}
@@ -507,6 +510,12 @@ function App() {
           <button className="ghost-link" onClick={returnToGallery} type="button">
             Back to project gallery
           </button>
+          {!liveModeAvailable && (
+            <p className="support-note">
+              Live voice is available in the local build with the realtime server and
+              API key.
+            </p>
+          )}
           {realtimeError && <p className="error-note">{realtimeError}</p>}
         </section>
       )}
@@ -612,10 +621,17 @@ function App() {
               </button>
               <button
                 className="secondary-button panel-button"
+                disabled={!liveModeAvailable}
                 onClick={startFacilitatorRealtimeSession}
               >
                 Talk live with Facilitator
               </button>
+              {!liveModeAvailable && (
+                <p className="support-note panel-note">
+                  Live facilitator mode is available in the local build with the
+                  realtime server and API key.
+                </p>
+              )}
               {realtimeError && screen === "facilitator-lab" && (
                 <p className="error-note panel-error">{realtimeError}</p>
               )}

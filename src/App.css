@@ -19,6 +19,11 @@ button {
   font: inherit;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
 .app {
   min-height: 100vh;
   display: flex;
@@ -215,6 +220,14 @@ h1 {
   color: rgba(255, 255, 255, 0.52);
 }
 
+.support-note {
+  margin: 14px auto 0;
+  max-width: 360px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.46);
+}
+
 .facilitator-layout {
   width: min(1120px, 100%);
   display: grid;
@@ -403,6 +416,11 @@ h1 {
   margin-right: 0;
 }
 
+.panel-note {
+  margin-left: 0;
+  max-width: none;
+}
+
 .signal-list {
   display: grid;
   gap: 12px;
@@ -514,6 +532,13 @@ h1 {
   background: rgba(255, 255, 255, 0.13);
   border-color: rgba(255, 255, 255, 0.26);
   transform: translateY(-1px);
+}
+
+.primary-button:disabled:hover,
+.secondary-button:disabled:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: none;
 }
 
 .secondary-button {
