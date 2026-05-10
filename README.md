@@ -1,5 +1,7 @@
 # Humlab Voice Agent Cases
 
+![Project gallery](docs/project-gallery.png)
+
 This repository holds two voice agent case studies built as live prototypes:
 
 - `Good Night` — a voice experience for letting go before sleep
