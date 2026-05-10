@@ -222,6 +222,78 @@ h1 {
   animation: fadeIn 900ms ease both;
 }
 
+.gallery-layout {
+  width: min(1120px, 100%);
+  display: grid;
+  gap: 28px;
+  animation: fadeIn 900ms ease both;
+}
+
+.gallery-hero {
+  max-width: 760px;
+}
+
+.gallery-subtitle {
+  max-width: 620px;
+  margin-left: 0;
+  text-align: left;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  min-height: 380px;
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  padding: 26px;
+  border: 1px solid rgba(255, 240, 224, 0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(18px);
+}
+
+.project-card h2 {
+  margin: 10px 0 0;
+  font-size: 2.3rem;
+  font-weight: 500;
+  color: rgba(255, 248, 240, 0.94);
+}
+
+.project-card p {
+  margin: 0;
+  max-width: 420px;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 240, 224, 0.7);
+}
+
+.project-card-night {
+  background:
+    radial-gradient(circle at top, rgba(246, 243, 255, 0.1), transparent 30%),
+    linear-gradient(180deg, rgba(20, 23, 38, 0.92), rgba(7, 8, 16, 0.92));
+}
+
+.project-card-facilitator {
+  background:
+    radial-gradient(circle at top, rgba(255, 237, 210, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(32, 22, 12, 0.92), rgba(14, 10, 7, 0.92));
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-button {
+  justify-self: start;
+  margin-top: 0;
+}
+
 .facilitator-hero {
   padding: 20px 4px 0;
 }
@@ -547,6 +619,10 @@ h1 {
 
   .facilitator-layout {
     width: 100%;
+  }
+
+  .project-grid {
+    grid-template-columns: 1fr;
   }
 
   .persona-option {

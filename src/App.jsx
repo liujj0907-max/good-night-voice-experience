@@ -46,11 +46,18 @@ const PERSONAS = [
   },
 ];
 const CASES = [
-  { id: "good-night", label: "Good Night", eyebrow: "Voice UX Prototype" },
+  {
+    id: "good-night",
+    label: "Good Night",
+    eyebrow: "Voice UX Prototype",
+    summary: "A voice experience for letting go before sleep.",
+  },
   {
     id: "interview-facilitator",
     label: "Interview Facilitator",
     eyebrow: "Voice Agent Lab",
+    summary:
+      "A pause-aware facilitator for thinking-in-progress before an interview.",
   },
 ];
 const FACILITATOR_SIGNALS = [
@@ -87,7 +94,7 @@ function App() {
   const realtimePeerRef = useRef(null);
   const realtimeStreamRef = useRef(null);
 
-  const [screen, setScreen] = useState("landing"); // landing | session | realtime | end | facilitator-lab
+  const [screen, setScreen] = useState("gallery"); // gallery | landing | session | realtime | end | facilitator-lab
   const [selectedCaseId, setSelectedCaseId] = useState("good-night");
   const [showCaseNotes, setShowCaseNotes] = useState(false);
   const [selectedPersonaId, setSelectedPersonaId] = useState("mark");
@@ -290,15 +297,23 @@ function App() {
     setTimeLeft(null);
   };
 
+  const openGoodNightCase = () => {
+    setSelectedCaseId("good-night");
+    setScreen("landing");
+    setShowCaseNotes(false);
+    setRealtimeError("");
+  };
+
   const openFacilitatorLab = () => {
+    setSelectedCaseId("interview-facilitator");
     setScreen("facilitator-lab");
     setShowCaseNotes(false);
     setRealtimeError("");
   };
 
-  const returnToLanding = () => {
+  const returnToGallery = () => {
     stopRealtimeSession();
-    setScreen("landing");
+    setScreen("gallery");
     setRealtimeError("");
   };
 
@@ -404,6 +419,49 @@ function App() {
         </div>
       )}
 
+      {screen === "gallery" && (
+        <section className="gallery-layout">
+          <div className="gallery-hero">
+            <p className="eyebrow">Humlab Voice Agent Cases</p>
+            <h1>Two voice agents, two opposite interaction instincts.</h1>
+            <p className="subtitle gallery-subtitle">
+              One case is about letting the interaction fade away. The other is
+              about protecting unfinished thinking from being closed too early.
+            </p>
+          </div>
+
+          <div className="project-grid">
+            <article className="project-card project-card-night">
+              <span className="panel-label">{CASES[0].eyebrow}</span>
+              <h2>{CASES[0].label}</h2>
+              <p>{CASES[0].summary}</p>
+              <div className="project-tags">
+                <span className="phase-pill">Designed withdrawal</span>
+                <span className="phase-pill">Audio fade</span>
+                <span className="phase-pill">Low stimulation</span>
+              </div>
+              <button className="primary-button project-button" onClick={openGoodNightCase}>
+                Open Good Night
+              </button>
+            </article>
+
+            <article className="project-card project-card-facilitator">
+              <span className="panel-label">{CASES[1].eyebrow}</span>
+              <h2>{CASES[1].label}</h2>
+              <p>{CASES[1].summary}</p>
+              <div className="project-tags">
+                <span className="phase-pill">Pause-aware</span>
+                <span className="phase-pill">Thinking-in-progress</span>
+                <span className="phase-pill">Voice facilitation</span>
+              </div>
+              <button className="primary-button project-button" onClick={openFacilitatorLab}>
+                Open Facilitator Lab
+              </button>
+            </article>
+          </div>
+        </section>
+      )}
+
       {screen === "landing" && (
         <button
           className="case-toggle"
@@ -446,8 +504,8 @@ function App() {
           >
             Talk live with {selectedPersona.name}
           </button>
-          <button className="ghost-link" onClick={openFacilitatorLab} type="button">
-            Open Interview Facilitator Lab
+          <button className="ghost-link" onClick={returnToGallery} type="button">
+            Back to project gallery
           </button>
           {realtimeError && <p className="error-note">{realtimeError}</p>}
         </section>
@@ -597,8 +655,8 @@ function App() {
             </section>
           </div>
 
-          <button className="secondary-button back-button" onClick={returnToLanding}>
-            Back to Good Night
+          <button className="secondary-button back-button" onClick={returnToGallery}>
+            Back to project gallery
           </button>
         </section>
       )}
