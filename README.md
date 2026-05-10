@@ -1,70 +1,81 @@
-# Good Night Voice Experience
+# Humlab Voice Agent Cases
+
+This repository holds two voice agent case studies built as live prototypes:
+
+- `Good Night` — a voice experience for letting go before sleep
+- `Interview Facilitator` — a pause-aware voice agent for thinking-in-progress before an interview
+
+Both cases explore a similar question from opposite directions: not how AI can say more, but how voice agents can shape rhythm, attention, and the structure of interaction.
+
+## Cases
+
+### Good Night
 
 Good Night is a time-based Voice UX prototype exploring how a voice experience can help someone disengage from their phone before sleep.
 
 It is not designed as a general-purpose chatbot. The interaction is intentionally quiet: one tap to begin, a low-stimulation screen, a short voice presence, and a gradual fade toward silence.
 
-## Concept
+Core idea:
 
-Many bedtime products try to add more content: longer stories, more prompts, more choices, more tracking. Good Night tests the opposite direction.
+- Many bedtime products add more content, more prompts, and more engagement.
+- Good Night tests the opposite direction.
+- The design question is not only what the AI should say, but when the AI is no longer needed to speak.
 
-The prototype asks:
+Session arc:
 
-- What if the voice gradually becomes less present?
-- What if the user is not asked to reply?
-- What if the end of the interaction is a cue to put the phone away?
+`Arrival -> Unloading -> Slowing -> Fading -> Exit`
 
-## Prototype Flow
+Current implementation:
 
-Arrival -> Unloading -> Slowing -> Fading -> Exit
-
-The key design question is not only what the AI should say, but when the AI is no longer needed to speak.
-
-## Persona Strategy
-
-The broader concept uses three personas as different ways of helping the user let go:
-
-- Mark / Release: warm, slightly distant, helps emotional residue loosen
-- Alice / Disengage: grounded and minimal, reduces participation
-- Marian / Settle: stable and soft, creates permission to stop
-
-The current implementation includes playable demos for all three personas.
-
-## Voice Temperament Sources
-
-These backgrounds are not meant to become visible roleplay prompts inside the session. They are design sources for pacing, tone, and the amount of presence each voice should carry.
-
-- Mark: around 35, gentle, works in a bar, and is usually awake after hours. His voice should feel like someone who can listen without pulling the user into more conversation.
-- Alice: around 32, an emergency doctor who often works shifts. Her voice should feel grounded, brief, and able to help the user transition out of active participation.
-- Marian: around 85, widowed for six years, living with a cat in an old but warm apartment. Her nighttime image is knitting on the sofa; her voice should create quiet permission to stop.
-
-## Current Features
-
-- Minimal React + Vite prototype
 - Persona selection for Mark, Alice, and Marian
-- Persona-specific voice session playback
-- Live Realtime voice mode for Mark, Alice, and Marian
-- Dark, low-stimulation interface
-- Breathing dot during the session
+- Recorded voice demos
+- Live Realtime voice mode
 - Final 30-second audio fade
-- Manual Good Night exit
-- End screen encouraging phone disengagement
+- Case notes panel describing design intent
 
-## Design Direction
+Prompt and voice notes for Good Night live testing are in [docs/realtime-playground-prompts.md](docs/realtime-playground-prompts.md).
 
-This case focuses on voice as presence rather than instruction. The goal is to reduce interaction demand, lower visual stimulation, and make silence part of the experience.
+### Interview Facilitator
 
-The strongest principle is designed withdrawal: voice, UI, and prompts gradually reduce their presence so the user can leave the interaction.
+Interview Facilitator is a pause-aware voice agent prototype for interview preparation.
 
-## Realtime Playground
+It is not meant to be a fast answer engine or an AI interviewer that takes over the conversation. Its role is to help the user think through an interview direction while they are still forming what they want to learn.
 
-Prompt drafts for testing Good Night with OpenAI Playground and `gpt-realtime-2` are in [docs/realtime-playground-prompts.md](docs/realtime-playground-prompts.md).
+Core idea:
 
-The local prototype also includes a live Realtime mode. It uses a small local server in `server.mjs` so the OpenAI API key stays outside the browser.
+- Treat hesitation, restarts, and silence as part of thinking.
+- Avoid closing uncertainty too early with structure.
+- Use short, non-leading questions to help the user name what the interview is really trying to understand.
+
+Interaction arc:
+
+`Warm-up -> Goal -> Recent Example -> Probe -> Synthesis`
+
+Current implementation:
+
+- A dedicated `Interview Facilitator Lab` page
+- Session brief input for defining the interview topic
+- Draft question-direction output
+- Live Realtime facilitator mode with a separate prompt path from Good Night
+
+## Realtime Setup
+
+This repo uses a small local server in [server.mjs](/Users/martaliu/Downloads/good-night-voice-experience/server.mjs) so the OpenAI API key stays outside the browser.
+
+Create a local env file:
 
 ```bash
-OPENAI_API_KEY=your_api_key npm run dev
+cp .env.example .env.local
 ```
+
+Then set:
+
+```bash
+OPENAI_API_KEY=sk-your-api-key-here
+REALTIME_VOICE=cedar
+```
+
+This file is ignored by git.
 
 ## Run Locally
 
@@ -72,6 +83,10 @@ OPENAI_API_KEY=your_api_key npm run dev
 npm install
 npm run dev
 ```
+
+The local app runs at:
+
+`http://127.0.0.1:5173/`
 
 ## Build
 
