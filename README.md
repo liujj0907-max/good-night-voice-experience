@@ -42,7 +42,7 @@ Current implementation:
 
 - Persona selection for Mark, Alice, and Marian
 - Recorded voice demos
-- Live Realtime voice mode
+- Local-only Live Realtime voice mode
 - Final 30-second audio fade
 - Case notes panel describing design intent
 
@@ -69,13 +69,13 @@ Current implementation:
 - A dedicated `Interview Facilitator Lab` page
 - Session brief input for defining the interview topic
 - Draft question-direction output
-- Live Realtime facilitator mode with a separate prompt path from Good Night
+- Local-only Live Realtime facilitator mode with a separate prompt path from Good Night
 
 ## Public Site
 
 The static portfolio version of this repo is designed to be published on GitHub Pages:
 
-[https://liujj0907-max.github.io/good-night-voice-experience/](https://liujj0907-max.github.io/good-night-voice-experience/)
+[https://resonantravine.github.io/good-night-voice-experience/](https://resonantravine.github.io/good-night-voice-experience/)
 
 The public site is meant to showcase the two cases, their structure, and the recorded demos.
 
@@ -110,6 +110,14 @@ npm run dev
 The local app runs at:
 
 `http://127.0.0.1:5173/`
+
+`npm run dev` starts the local Vite app through [server.mjs](server.mjs), including the local Realtime endpoint.
+
+If you need to run the Realtime server through a local proxy, use:
+
+```bash
+npm run dev:proxy
+```
 
 ## Build
 
