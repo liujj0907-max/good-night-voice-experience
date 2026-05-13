@@ -90,6 +90,27 @@ const GOOD_NIGHT_LANGUAGE_OPTIONS = [
     description: "Recorded demo",
   },
 ];
+const ROUTES = {
+  gallery: "",
+  goodNight: "good-night",
+  facilitator: "interview-facilitator",
+};
+
+const getRouteFromHash = () => {
+  if (typeof window === "undefined") return ROUTES.gallery;
+  return window.location.hash.replace(/^#\/?/, "");
+};
+
+const getScreenForRoute = (route) => {
+  if (route === ROUTES.goodNight) return "landing";
+  if (route === ROUTES.facilitator) return "facilitator-lab";
+  return "gallery";
+};
+
+const getCaseIdForRoute = (route) => {
+  if (route === ROUTES.facilitator) return "interview-facilitator";
+  return "good-night";
+};
 
 const getErrorMessage = (errorBody) => {
   if (!errorBody) return "Could not start realtime session.";
@@ -110,8 +131,11 @@ function App() {
   const realtimePeerRef = useRef(null);
   const realtimeStreamRef = useRef(null);
 
-  const [screen, setScreen] = useState("gallery"); // gallery | landing | session | realtime | end | facilitator-lab
-  const [selectedCaseId, setSelectedCaseId] = useState("good-night");
+  const initialRoute = getRouteFromHash();
+  const [screen, setScreen] = useState(getScreenForRoute(initialRoute)); // gallery | landing | session | realtime | end | facilitator-lab
+  const [selectedCaseId, setSelectedCaseId] = useState(
+    getCaseIdForRoute(initialRoute),
+  );
   const [showCaseNotes, setShowCaseNotes] = useState(false);
   const [goodNightLanguage, setGoodNightLanguage] = useState("en");
   const [selectedPersonaId, setSelectedPersonaId] = useState("mark");
@@ -174,6 +198,52 @@ function App() {
     }
 
     setRealtimeStatus("idle");
+  };
+
+  const stopRecordedSession = () => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+
+    setIsFading(false);
+    setTimeLeft(null);
+  };
+
+  const applyRoute = (route) => {
+    stopRealtimeSession();
+    stopRecordedSession();
+    setSelectedCaseId(getCaseIdForRoute(route));
+    setScreen(getScreenForRoute(route));
+    setShowCaseNotes(false);
+    setRealtimeError("");
+  };
+
+  const navigateToRoute = (route) => {
+    if (typeof window === "undefined") {
+      applyRoute(route);
+      return;
+    }
+
+    const nextHash = route ? `#/${route}` : "";
+    const currentPath = `${window.location.pathname}${window.location.search}`;
+
+    if (nextHash) {
+      if (window.location.hash === nextHash) {
+        applyRoute(route);
+      } else {
+        window.location.hash = nextHash;
+      }
+    } else {
+      window.history.pushState(null, "", currentPath);
+      applyRoute(ROUTES.gallery);
+    }
   };
 
   const startRealtimeSession = async ({
@@ -288,41 +358,21 @@ function App() {
 
   const endSession = () => {
     stopRealtimeSession();
-
-    if (fadeIntervalRef.current) {
-      clearInterval(fadeIntervalRef.current);
-      fadeIntervalRef.current = null;
-    }
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current = null;
-    }
+    stopRecordedSession();
 
     setScreen("end");
-    setIsFading(false);
-    setTimeLeft(null);
   };
 
   const openGoodNightCase = () => {
-    setSelectedCaseId("good-night");
-    setScreen("landing");
-    setShowCaseNotes(false);
-    setRealtimeError("");
+    navigateToRoute(ROUTES.goodNight);
   };
 
   const openFacilitatorLab = () => {
-    setSelectedCaseId("interview-facilitator");
-    setScreen("facilitator-lab");
-    setShowCaseNotes(false);
-    setRealtimeError("");
+    navigateToRoute(ROUTES.facilitator);
   };
 
   const returnToGallery = () => {
-    stopRealtimeSession();
-    setScreen("gallery");
-    setRealtimeError("");
+    navigateToRoute(ROUTES.gallery);
   };
 
   const leaveRealtimeSession = () => {
@@ -346,6 +396,15 @@ function App() {
       ],
     });
   };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      applyRoute(getRouteFromHash());
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  });
 
   useEffect(() => {
     let timer;
@@ -414,11 +473,13 @@ function App() {
                 selectedCaseId === item.id ? "mode-chip-active" : ""
               }`}
               key={item.id}
-              onClick={() => {
-                setSelectedCaseId(item.id);
-                setShowCaseNotes(false);
-                setScreen(item.id === "good-night" ? "landing" : "facilitator-lab");
-              }}
+              onClick={() =>
+                navigateToRoute(
+                  item.id === "good-night"
+                    ? ROUTES.goodNight
+                    : ROUTES.facilitator,
+                )
+              }
               type="button"
             >
               {item.label}
@@ -433,8 +494,10 @@ function App() {
             <p className="eyebrow">Humlab Voice Agent Cases</p>
             <h1>Two voice agents, two opposite interaction instincts.</h1>
             <p className="subtitle gallery-subtitle">
-              One case is about letting the interaction fade away. The other is
-              about protecting unfinished thinking from being closed too early.
+              Choose a standalone case. Good Night lives at{" "}
+              <span className="inline-route">#/good-night</span>; Interview
+              Facilitator lives at{" "}
+              <span className="inline-route">#/interview-facilitator</span>.
             </p>
           </div>
 
@@ -542,7 +605,7 @@ function App() {
             </>
           )}
           <button className="ghost-link" onClick={returnToGallery} type="button">
-            Back to project gallery
+            Back to project index
           </button>
           {realtimeError && <p className="error-note">{realtimeError}</p>}
         </section>
@@ -700,7 +763,7 @@ function App() {
           </div>
 
           <button className="secondary-button back-button" onClick={returnToGallery}>
-            Back to project gallery
+            Back to project index
           </button>
         </section>
       )}

@@ -81,7 +81,12 @@ The static portfolio version of this repo is designed to be published on GitHub 
 
 [https://resonantravine.github.io/good-night-voice-experience/](https://resonantravine.github.io/good-night-voice-experience/)
 
-The public site is meant to showcase the two cases, their structure, the Chinese recorded Good Night demo, and the English ElevenLabs Agent path.
+The public site now has separate shareable case routes:
+
+- [Good Night](https://resonantravine.github.io/good-night-voice-experience/#/good-night)
+- [Interview Facilitator](https://resonantravine.github.io/good-night-voice-experience/#/interview-facilitator)
+
+The project index still shows both cases together, but each case can be opened as its own page with its own URL.
 
 The English Good Night mode opens the published ElevenLabs Agent:
 
