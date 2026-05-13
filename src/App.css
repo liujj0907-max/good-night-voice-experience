@@ -466,6 +466,43 @@ h1 {
   margin: 36px auto 0;
 }
 
+.language-selector {
+  width: 100%;
+  max-width: 420px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 34px auto 0;
+}
+
+.language-option {
+  min-height: 82px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 14px 12px;
+  color: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+.language-option:hover {
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.language-option-active {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.34);
+  transform: translateY(-1px);
+}
+
 .persona-option {
   min-height: 78px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -495,15 +532,19 @@ h1 {
 }
 
 .persona-option span,
-.persona-option small {
+.persona-option small,
+.language-option span,
+.language-option small {
   display: block;
 }
 
-.persona-option span {
+.persona-option span,
+.language-option span {
   font-size: 0.96rem;
 }
 
-.persona-option small {
+.persona-option small,
+.language-option small {
   margin-top: 7px;
   font-size: 0.72rem;
   letter-spacing: 0.08em;
@@ -513,6 +554,7 @@ h1 {
 
 .primary-button,
 .secondary-button {
+  display: inline-block;
   margin-top: 28px;
   min-width: 180px;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -521,6 +563,7 @@ h1 {
   color: rgba(255, 255, 255, 0.88);
   background: rgba(255, 255, 255, 0.08);
   cursor: pointer;
+  text-decoration: none;
   transition:
     background 200ms ease,
     transform 200ms ease,
@@ -550,6 +593,11 @@ h1 {
 .compact-button {
   display: block;
   margin: 14px auto 0;
+}
+
+.agent-note {
+  max-width: 310px;
+  margin-top: 18px;
 }
 
 .ghost-link {
@@ -634,6 +682,11 @@ h1 {
   }
 
   .persona-selector {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+  }
+
+  .language-selector {
     grid-template-columns: 1fr;
     max-width: 320px;
   }

@@ -3,6 +3,8 @@ import "./App.css";
 
 const FADE_DURATION_SECONDS = 30;
 const assetPath = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+const GOOD_NIGHT_AGENT_URL =
+  "https://elevenlabs.io/app/talk-to?agent_id=agent_2501krfhz1k1fnbaygh21mamqec9&branch_id=agtbrch_4001krfhz2mgfcs8kxd50dzdds0z";
 const GOOD_NIGHT_PHASES = ["Arrival", "Unloading", "Slowing", "Fading", "Exit"];
 const FACILITATOR_PHASES = [
   "Warm-up",
@@ -76,6 +78,18 @@ const FACILITATOR_EXAMPLES = [
   "I want to interview people about how they unwind at night, but I don't know where the real tension is yet.",
   "I'm preparing a conversation with remote workers about focus rituals and I need help figuring out what to probe.",
 ];
+const GOOD_NIGHT_LANGUAGE_OPTIONS = [
+  {
+    id: "en",
+    label: "English",
+    description: "Live ElevenLabs Agent",
+  },
+  {
+    id: "zh",
+    label: "中文",
+    description: "Recorded demo",
+  },
+];
 
 const getErrorMessage = (errorBody) => {
   if (!errorBody) return "Could not start realtime session.";
@@ -99,6 +113,7 @@ function App() {
   const [screen, setScreen] = useState("gallery"); // gallery | landing | session | realtime | end | facilitator-lab
   const [selectedCaseId, setSelectedCaseId] = useState("good-night");
   const [showCaseNotes, setShowCaseNotes] = useState(false);
+  const [goodNightLanguage, setGoodNightLanguage] = useState("en");
   const [selectedPersonaId, setSelectedPersonaId] = useState("mark");
   const [isFading, setIsFading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
@@ -123,7 +138,7 @@ function App() {
   const selectedPersona =
     PERSONAS.find((persona) => persona.id === selectedPersonaId) || PERSONAS[0];
 
-  const startSession = () => {
+  const startRecordedSession = () => {
     const audio = new Audio(selectedPersona.audioSrc);
     audio.volume = 1;
     audioRef.current = audio;
@@ -258,15 +273,6 @@ function App() {
       setRealtimeError(error.message);
     }
   };
-
-  const startGoodNightRealtimeSession = () =>
-    startRealtimeSession({
-      experience: "good-night",
-      requestUrl: `/api/realtime/session?persona=${selectedPersona.id}`,
-      returnScreen: "landing",
-      initialInstructions:
-        "Begin with one very short, quiet greeting in the persona voice. Do not ask more than one simple question.",
-    });
 
   const startFacilitatorRealtimeSession = () =>
     startRealtimeSession({
@@ -481,41 +487,63 @@ function App() {
           <h1>Good Night</h1>
           <p className="subtitle">A voice experience for letting go before sleep.</p>
           <p className="description">For nights when your mind keeps moving.</p>
-          <div className="persona-selector" aria-label="Choose a voice persona">
-            {PERSONAS.map((persona) => (
+          <div className="language-selector" aria-label="Choose Good Night language">
+            {GOOD_NIGHT_LANGUAGE_OPTIONS.map((option) => (
               <button
-                aria-pressed={selectedPersonaId === persona.id}
-                className={`persona-option ${
-                  selectedPersonaId === persona.id ? "persona-option-active" : ""
+                aria-pressed={goodNightLanguage === option.id}
+                className={`language-option ${
+                  goodNightLanguage === option.id ? "language-option-active" : ""
                 }`}
-                key={persona.id}
-                onClick={() => setSelectedPersonaId(persona.id)}
+                key={option.id}
+                onClick={() => setGoodNightLanguage(option.id)}
                 type="button"
               >
-                <span>{persona.name}</span>
-                <small>{persona.role}</small>
+                <span>{option.label}</span>
+                <small>{option.description}</small>
               </button>
             ))}
           </div>
-          <button className="primary-button" onClick={startSession}>
-            Play recorded demo
-          </button>
-          <button
-            className="secondary-button compact-button"
-            disabled={!liveModeAvailable}
-            onClick={startGoodNightRealtimeSession}
-          >
-            Talk live with {selectedPersona.name}
-          </button>
+          {goodNightLanguage === "zh" && (
+            <>
+              <div className="persona-selector" aria-label="Choose a voice persona">
+                {PERSONAS.map((persona) => (
+                  <button
+                    aria-pressed={selectedPersonaId === persona.id}
+                    className={`persona-option ${
+                      selectedPersonaId === persona.id ? "persona-option-active" : ""
+                    }`}
+                    key={persona.id}
+                    onClick={() => setSelectedPersonaId(persona.id)}
+                    type="button"
+                  >
+                    <span>{persona.name}</span>
+                    <small>{persona.role}</small>
+                  </button>
+                ))}
+              </div>
+              <button className="primary-button" onClick={startRecordedSession}>
+                Play Chinese demo
+              </button>
+            </>
+          )}
+          {goodNightLanguage === "en" && (
+            <>
+              <p className="support-note agent-note">
+                English mode opens the live ElevenLabs Conversational Agent.
+              </p>
+              <a
+                className="primary-button"
+                href={GOOD_NIGHT_AGENT_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Talk live in English
+              </a>
+            </>
+          )}
           <button className="ghost-link" onClick={returnToGallery} type="button">
             Back to project gallery
           </button>
-          {!liveModeAvailable && (
-            <p className="support-note">
-              Live voice is available in the local build with the realtime server and
-              API key.
-            </p>
-          )}
           {realtimeError && <p className="error-note">{realtimeError}</p>}
         </section>
       )}
@@ -718,7 +746,9 @@ function App() {
               : "This mode uses the microphone and responds in real time."}
           </p>
 
-          <p className="time-left">{realtimeStatus}</p>
+          <p className="time-left">
+            {realtimeStatus}
+          </p>
           {realtimeExperience === "facilitator" && (
             <p className="fade-note">
               The facilitator should wait through pauses instead of filling them too fast.
