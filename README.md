@@ -1,6 +1,10 @@
 # Humlab Voice Agent Cases
 
-![Project gallery](docs/project-gallery.png)
+Two voice UX prototypes exploring when AI should speak less: a bedtime disengagement companion and a pause-aware interview facilitator.
+
+![Project preview](docs/share-preview.png)
+
+[Watch the short demo video](docs/good-night-demo.webm)
 
 This repository holds two voice agent case studies built as live prototypes:
 
